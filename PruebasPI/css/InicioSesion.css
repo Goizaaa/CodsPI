@@ -1,0 +1,56 @@
+.pan {
+    display: none;
+}
+
+.pan.activa {
+    display: block;
+}
+h1{
+    text-align: center;
+    background-color: #0ca4d4;
+    padding: 3%;
+}
+h2{
+    text-align: center;
+    padding: 1%;
+    border: 2px solid black;
+}
+h3{
+    text-align: center;
+    padding: 1%;
+}
+form{
+    
+    text-align: center;
+}
+button{
+    text-align: center;
+    padding: 2%;
+}
+footer{
+    padding: 3%;
+}
+div{
+    padding: 2%;
+}
+label{
+    display: block;
+}
+body{
+    background-color: #EFF3FF;
+}
+form input.error {
+    border: 2px solid #dd356e;
+}
+
+form .mensaje {
+    color: #dd356e;
+    background-color: rgba(212, 63, 58, 0.25);
+    display: none;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+form .mensaje.show {
+    display: block;
+}
