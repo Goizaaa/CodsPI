@@ -76,8 +76,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     const $form = document.getElementById('registro');
-    const $email = document.getElementById('correo');
-    const $password = document.getElementById('contra');
+    const $email = document.getElementById('correoU');
+    const $password = document.getElementById('contraU');
     const $messages = $form.querySelector('.mensaje');
     
 
