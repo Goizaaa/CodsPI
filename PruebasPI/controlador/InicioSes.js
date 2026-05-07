@@ -58,22 +58,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    
-
-    abredospasos.addEventListener("click", (event) => {
-        event.preventDefault();
-        recuperar.style.display = "none";
-        inicio.style.display = "none";
-        restablecer.style.display = "none";
-        dospasos.style.display = "block";
-        crear.style.display = "none";
-    });
-
-
-
-
-
-
 
     const $form = document.getElementById('registro');
     const $email = document.getElementById('correoU');
@@ -81,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const $messages = $form.querySelector('.mensaje');
     
 
-    $form.addEventListener('submit', function (event) {
+$form.addEventListener('submit', function (event) {
         event.preventDefault();
 
         let email = $email.value.trim();
@@ -96,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $email.classList.add('error');
         }
 
-
+        
         if (password.length >= 4) {
             $password.classList.remove('error');
         } else {
@@ -104,13 +88,56 @@ document.addEventListener('DOMContentLoaded', function () {
             $password.classList.add('error');
         }
 
-
+        
         if (errors.length > 0) {
             $messages.innerHTML = errors.join('');
             $messages.classList.add('show');
         } else {
             $messages.classList.remove('show');
-            $form.submit();
+ let datos = new FormData();
+
+            datos.append("login", true);
+
+            datos.append("correo", email);
+
+            datos.append("password", password);
+
+
+
+
+            fetch("../Controlador/ControLogin.php", {
+
+                method: "POST",
+
+                body: datos
+
+            })
+
+            .then(res => res.json())
+
+            .then(datos => {
+
+                alert(datos.mensaje);
+
+
+
+
+                if(datos.status)
+                {
+
+                    window.location.href = "../Vista/index.html";
+
+                }
+
+            })
+
+            .catch(error => {
+
+                console.log(error);
+
+            });
+
         }
+
     });
 });
