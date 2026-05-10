@@ -59,85 +59,149 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    const $form = document.getElementById('registro');
+const $form = document.getElementById('registro');
     const $email = document.getElementById('correoU');
     const $password = document.getElementById('contraU');
-    const $messages = $form.querySelector('.mensaje');
-    
+    const $messages = $form ? $form.querySelector('.mensaje') : null;
 
-$form.addEventListener('submit', function (event) {
-        event.preventDefault();
+    if ($form) {
+        $form.addEventListener('submit', function (event) {
+            event.preventDefault();
 
-        let email = $email.value.trim();
-        let password = $password.value.trim();
-        let errors = [];
+            let email = $email.value.trim();
+            let password = $password.value.trim();
+            let errors = [];
 
-        // Validación email
-        if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            $email.classList.remove('error');
-        } else {
-            errors.push('El email no es válido.<br>');
-            $email.classList.add('error');
-        }
+            // Validación de correo
+            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                $email.classList.remove('error');
+            } else {
+                errors.push('El email no es válido.<br>');
+                $email.classList.add('error');
+            }
 
-        
-        if (password.length >= 4) {
-            $password.classList.remove('error');
-        } else {
-            errors.push('La contraseña debe tener al menos 4 caracteres.<br>');
-            $password.classList.add('error');
-        }
+            // Validación de contraseña
+            if (password.length >= 4) {
+                $password.classList.remove('error');
+            } else {
+                errors.push('La contraseña debe tener al menos 4 caracteres.<br>');
+                $password.classList.add('error');
+            }
 
-        
-        if (errors.length > 0) {
-            $messages.innerHTML = errors.join('');
-            $messages.classList.add('show');
-        } else {
-            $messages.classList.remove('show');
- let datos = new FormData();
-
-            datos.append("login", true);
-
-            datos.append("correo", email);
-
-            datos.append("password", password);
-
-
-
-
-            fetch("../Controlador/ControLogin.php", {
-
-                method: "POST",
-
-                body: datos
-
-            })
-
-            .then(res => res.json())
-
-            .then(datos => {
-
-                alert(datos.mensaje);
-
-
-
-
-                if(datos.status)
-                {
-
-                    window.location.href = "../Vista/index.html";
-
+            // Mostrar errores
+            if (errors.length > 0) {
+                if ($messages) {
+                    $messages.innerHTML = errors.join('');
+                    $messages.classList.add('show');
+                }
+            } else {
+                if ($messages) {
+                    $messages.classList.remove('show');
                 }
 
+                let datos = new FormData();
+
+                datos.append("login", true);
+                datos.append("correo", email);
+                datos.append("password", password);
+
+                fetch("../Controlador/ControLogin.php", {
+                    method: "POST",
+                    body: datos
+                })
+                .then(function (res) {
+                    return res.json();
+                })
+                .then(function (datos) {
+                    alert(datos.mensaje);
+
+                    if (datos.status) {
+                        window.location.href = "../Vista/index.html";
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        });
+    }
+     const btnCrear = document.getElementById("crearbtn");
+
+    if (btnCrear) {
+        btnCrear.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            let correo = document.getElementById("usuarioCI").value.trim();
+            let confirmarCorreo = document.getElementById("usuarioaCI").value.trim();
+            let password = document.getElementById("contraseñaCI").value.trim();
+            let confirmarPassword = document.getElementById("contraseñaa").value.trim();
+
+            let errores = [];
+
+            // Validar correo
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+                errores.push("El correo no es válido.");
+            }
+
+            // Confirmar correo
+            if (correo !== confirmarCorreo) {
+                errores.push("Los correos no coinciden.");
+            }
+
+            // Validar contraseña
+            if (password.length < 4) {
+                errores.push("La contraseña debe tener al menos 4 caracteres.");
+            }
+
+            // Confirmar contraseña
+            if (password !== confirmarPassword) {
+                errores.push("Las contraseñas no coinciden.");
+            }
+
+            // Mostrar errores
+            if (errores.length > 0) {
+                alert(errores.join("\n"));
+                return;
+            }
+
+            // Obtener nombre a partir del correo
+            let nombre = correo.split("@")[0];
+
+            let datos = new FormData();
+
+            datos.append("crear", true);
+            datos.append("correo", correo);
+            datos.append("password", password);
+            datos.append("nombre", nombre);
+
+            fetch("../Controlador/ControLogin.php", {
+                method: "POST",
+                body: datos
             })
+            .then(function (res) {
+                return res.json();
+            })
+            .then(function (datos) {
+                alert(datos.mensaje);
 
-            .catch(error => {
+                if (datos.status) {
+                    // Regresar al formulario de inicio de sesión
+                    inicio.style.display = "block";
+                    recuperar.style.display = "none";
+                    restablecer.style.display = "none";
+                    dospasos.style.display = "none";
+                    crear.style.display = "none";
 
+                    // Limpiar campos
+                    document.getElementById("usuarioCI").value = "";
+                    document.getElementById("usuarioaCI").value = "";
+                    document.getElementById("contraseñaCI").value = "";
+                    document.getElementById("contraseñaa").value = "";
+                }
+            })
+            .catch(function (error) {
                 console.log(error);
-
             });
-
-        }
-
-    });
+        });
+    }
 });
