@@ -4,9 +4,6 @@ require_once __DIR__ . '/../modelo/conexion.php';
 
 class ControLogin extends Conexion {
 
-
-
-
     public function iniciarSesion($correo, $password)
     {
 
@@ -17,18 +14,13 @@ class ControLogin extends Conexion {
 
         $resultado = $this->db->query($sql);
 
-
-
-
         if ($resultado->num_rows > 0)
         {
 
             $usuario = $resultado->fetch_assoc();
 
-
-
-
-            if(password_verify($password, $usuario["password"]))
+           
+            if($password == $usuario["password"])
             {
 
                 echo json_encode([
@@ -61,28 +53,16 @@ class ControLogin extends Conexion {
 
     }
 
-
-
-
-
-
     public function crearCuenta($correo, $password, $nombre)
     {
 
         $correo = $this->db->real_escape_string($correo);
-
         $nombre = $this->db->real_escape_string($nombre);
-
-
-
 
         $buscar = "SELECT * FROM usuarios 
                    WHERE correo = '$correo'";
 
         $resultado = $this->db->query($buscar);
-
-
-
 
         if($resultado->num_rows > 0)
         {
@@ -96,23 +76,13 @@ class ControLogin extends Conexion {
         else
         {
 
-            $passwordSegura = password_hash(
-                $password,
-                PASSWORD_DEFAULT
-            );
-
-
-
-
+           
             $sql = "INSERT INTO usuarios
                     (correo, password, nombre)
                     VALUES
-                    ('$correo', '$passwordSegura', '$nombre')";
+                    ('$correo', '$password', '$nombre')";
 
             $guardar = $this->db->query($sql);
-
-
-
 
             if($guardar)
             {
@@ -139,23 +109,10 @@ class ControLogin extends Conexion {
 
 }
 
-
-
-
-
-
-
-
-
-
 if($_SERVER["REQUEST_METHOD"] === "POST")
 {
 
     $controller = new ControLogin();
-
-
-
-
 
     if(isset($_POST["login"]))
     {
@@ -169,11 +126,6 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
         );
 
     }
-
-
-
-
-
 
     if(isset($_POST["crear"]))
     {

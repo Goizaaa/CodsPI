@@ -9,8 +9,6 @@ class Database {
 
     private mysqli $conn;
 
-
-
     public function __construct() {
 
         $this->conn = new mysqli(
@@ -26,10 +24,6 @@ class Database {
 
         }
     }
-
-
-
-
 
     public function create(string $table, array $data): bool {
 
@@ -52,10 +46,6 @@ class Database {
         return $result;
     }
 
-
-
-
-
     public function read(string $table, string $condition = "1"): array {
 
         $sql = "SELECT * FROM $table WHERE $condition";
@@ -70,10 +60,6 @@ class Database {
 
         return $result->fetch_all(MYSQLI_ASSOC);
     }
-
-
-
-
 
     public function update(string $table, array $data, string $condition): bool {
 
@@ -94,10 +80,6 @@ class Database {
         return $result;
     }
 
-
-
-
-
     public function delete(string $table, string $condition): bool {
 
         $sql = "DELETE FROM $table WHERE $condition";
@@ -111,35 +93,15 @@ class Database {
         return $result;
     }
 
-
-
-
-
     public function __destruct() {
 
         $this->conn->close();
     }
 }
 
-
-
-
-
-
-
 $db = new Database();
 
-
-
-
-
-
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-
-
-
     
     if (isset($_POST["crear"])) {
 
@@ -147,14 +109,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = trim($_POST["password"]);
         $nombre = trim($_POST["nombre"]);
 
-
-
         $buscarUsuario = $db->read(
             "usuarios",
             "correo = '$correo'"
         );
-
-
 
         if (count($buscarUsuario) > 0) {
 
@@ -162,23 +120,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         } else {
 
-            $passwordSegura = password_hash(
-                $password,
-                PASSWORD_DEFAULT
-            );
-
-
-
+            // Guardar contraseña en texto plano (sin cifrar)
             $crearUsuario = $db->create(
                 "usuarios",
                 [
                     "correo" => $correo,
-                    "password" => $passwordSegura,
+                    "password" => $password, // Contraseña en texto plano
                     "nombre" => $nombre
                 ]
             );
-
-
 
             if ($crearUsuario) {
 
@@ -190,44 +140,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     }
-
-
-
-
-
-
-
-
-
     
     if (isset($_POST["login"])) {
 
         $correo = trim($_POST["correo"]);
         $password = trim($_POST["password"]);
 
-
-
-
         $buscarUsuario = $db->read(
             "usuarios",
             "correo = '$correo'"
         );
 
-
-
-
         if (count($buscarUsuario) > 0) {
 
             $usuario = $buscarUsuario[0];
 
-
-
-            if (
-                password_verify(
-                    $password,
-                    $usuario["password"]
-                )
-            ) {
+            // Comparación directa en texto plano
+            if ($password == $usuario["password"]) {
 
                 echo "Inicio de sesion correcto";
 
@@ -242,5 +171,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
-
 ?>
