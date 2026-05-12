@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const dospasos = document.querySelector("#dospasos");
     const crear = document.querySelector("#crear");
 
+    let usuarioRecuperacion = null;
+
     if (inicio && recuperar && restablecer && dospasos && crear) {
         inicio.style.display = "block";
         recuperar.style.display = "none";
@@ -56,6 +58,145 @@ document.addEventListener('DOMContentLoaded', function () {
         dospasos.style.display = "none";
         crear.style.display = "none";
     });
+
+     const btnConfirmarRecuperacion = document.querySelector("#CONFIRMAR");
+     if (btnConfirmarRecuperacion) {
+        btnConfirmarRecuperacion.addEventListener("click", function(event) {
+            event.preventDefault();
+            
+            let correoRecuperacion = document.getElementById("usuarioD").value.trim();
+            let errores = [];
+            
+            if (correoRecuperacion === "") {
+                errores.push("Ingresa tu correo electrónico.");
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoRecuperacion)) {
+                errores.push("El formato del correo no es válido.");
+            }
+            
+            if (errores.length > 0) {
+                alert(errores.join("\n"));
+                return;
+            }
+            
+            let datos = new FormData();
+            datos.append("buscar_usuario", true);
+            datos.append("correo", correoRecuperacion);
+            
+            fetch("../Controlador/ControLogin.php", {
+                method: "POST",
+                body: datos
+            })
+            .then(function(res) {
+                return res.json();
+            })
+            .then(function(respuesta) {
+                if (respuesta.status) {
+                    usuarioRecuperacion = respuesta.usuario;
+                    
+                    recuperar.style.display = "none";
+                    inicio.style.display = "none";
+                    restablecer.style.display = "none";
+                    crear.style.display = "none";
+                    dospasos.style.display = "block";
+                } else {
+                    alert(respuesta.mensaje);
+                }
+            })
+            .catch(function(error) {
+                console.log(error);
+                alert("Error al verificar el correo.");
+            });
+        });
+    }
+    const btnConfirmarCodigo = document.querySelector("#ConfirC");
+
+    if (btnConfirmarCodigo) {
+        btnConfirmarCodigo.addEventListener("click", function(event) {
+            event.preventDefault();
+            
+            let codigo = document.getElementById("usuarioC").value.trim();
+            
+            if (codigo === "3221") {
+                if (usuarioRecuperacion) {
+                    document.getElementById("correo_restablecer").textContent = usuarioRecuperacion.correo;
+                    document.getElementById("nombre_restablecer").textContent = usuarioRecuperacion.nombre;
+                }
+                
+                recuperar.style.display = "none";
+                inicio.style.display = "none";
+                dospasos.style.display = "none";
+                crear.style.display = "none";
+                restablecer.style.display = "block";
+            } else {
+                alert("Código incorrecto. El código es: 3221");
+            }
+        });
+    }
+     const btnRestablecer = document.querySelector("#Restabtn");
+
+    if (btnRestablecer) {
+        btnRestablecer.addEventListener("click", function(event) {
+            event.preventDefault();
+            
+            let nuevaPassword = document.getElementById("contraseñaT").value.trim();
+            let confirmarPassword = document.getElementById("contraseñadTR").value.trim();
+            let errores = [];
+            
+            if (nuevaPassword === "") {
+                errores.push("Ingresa tu nueva contraseña.");
+            } else if (nuevaPassword.length < 4) {
+                errores.push("La contraseña debe tener al menos 4 caracteres.");
+            }
+            
+            if (nuevaPassword !== confirmarPassword) {
+                errores.push("Las contraseñas no coinciden.");
+            }
+            
+            if (errores.length > 0) {
+                alert(errores.join("\n"));
+                return;
+            }
+            
+            if (!usuarioRecuperacion) {
+                alert("No se encontró información. Reinicia el proceso.");
+                return;
+            }
+            
+            let datos = new FormData();
+            datos.append("actualizar_password", true);
+            datos.append("correo", usuarioRecuperacion.correo);
+            datos.append("password", nuevaPassword);
+            
+            fetch("../Controlador/ControLogin.php", {
+                method: "POST",
+                body: datos
+            })
+            .then(function(res) {
+                return res.json();
+            })
+            .then(function(respuesta) {
+                alert(respuesta.mensaje);
+                
+                if (respuesta.status) {
+                    document.getElementById("contraseñaT").value = "";
+                    document.getElementById("contraseñadTR").value = "";
+                    document.getElementById("usuarioD").value = "";
+                    document.getElementById("usuarioC").value = "";
+                    usuarioRecuperacion = null;
+                    
+                    recuperar.style.display = "none";
+                    dospasos.style.display = "none";
+                    restablecer.style.display = "none";
+                    crear.style.display = "none";
+                    inicio.style.display = "block";
+                }
+            })
+            .catch(function(error) {
+                console.log(error);
+                alert("Error al actualizar la contraseña.");
+            });
+        });
+    }
 
 
 

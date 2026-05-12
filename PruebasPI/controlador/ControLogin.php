@@ -107,6 +107,50 @@ class ControLogin extends Conexion {
 
     }
 
+    // ========== NUEVOS METODOS PARA RECUPERACION ==========
+
+    public function buscarUsuario($correo)
+    {
+        $correo = $this->db->real_escape_string($correo);
+        
+        $sql = "SELECT correo, nombre FROM usuarios WHERE correo = '$correo'";
+        $resultado = $this->db->query($sql);
+        
+        if ($resultado->num_rows > 0) {
+            $usuario = $resultado->fetch_assoc();
+            echo json_encode([
+                "status" => true,
+                "mensaje" => "Usuario encontrado",
+                "usuario" => $usuario
+            ]);
+        } else {
+            echo json_encode([
+                "status" => false,
+                "mensaje" => "El correo no está registrado"
+            ]);
+        }
+    }
+
+    public function actualizarPassword($correo, $password)
+    {
+        $correo = $this->db->real_escape_string($correo);
+        
+        $sql = "UPDATE usuarios SET password = '$password' WHERE correo = '$correo'";
+        $resultado = $this->db->query($sql);
+        
+        if ($resultado) {
+            echo json_encode([
+                "status" => true,
+                "mensaje" => "Contraseña actualizada correctamente"
+            ]);
+        } else {
+            echo json_encode([
+                "status" => false,
+                "mensaje" => "Error al actualizar la contraseña"
+            ]);
+        }
+    }
+
 }
 
 if($_SERVER["REQUEST_METHOD"] === "POST")
@@ -140,6 +184,21 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
             $nombre
         );
 
+    }
+
+    // ========== NUEVOS CASOS PARA RECUPERACION ==========
+
+    if(isset($_POST["buscar_usuario"]))
+    {
+        $correo = $_POST["correo"];
+        $controller->buscarUsuario($correo);
+    }
+
+    if(isset($_POST["actualizar_password"]))
+    {
+        $correo = $_POST["correo"];
+        $password = $_POST["password"];
+        $controller->actualizarPassword($correo, $password);
     }
 
 }
