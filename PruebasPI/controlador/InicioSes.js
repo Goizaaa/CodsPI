@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (codigo === "3221") {
                 if (usuarioRecuperacion) {
+                    document.getElementById("correo_original").value = usuarioRecuperacion.correo;
                     document.getElementById("correo_restablecer").textContent = usuarioRecuperacion.correo;
                     document.getElementById("nombre_restablecer").textContent = usuarioRecuperacion.nombre;
                 }
@@ -271,13 +272,24 @@ const $form = document.getElementById('registro');
     if (btnCrear) {
         btnCrear.addEventListener("click", function (event) {
             event.preventDefault();
-
+            let nombre = document.getElementById("NomU").value.trim();
+            let apellidoPaterno = document.getElementById("aPpU").value.trim();
+            let apellidoMaterno = document.getElementById("aPmU").value.trim();
             let correo = document.getElementById("usuarioCI").value.trim();
             let confirmarCorreo = document.getElementById("usuarioaCI").value.trim();
             let password = document.getElementById("contraseñaCI").value.trim();
             let confirmarPassword = document.getElementById("contraseñaa").value.trim();
 
             let errores = [];
+            if (nombre === "") {
+                errores.push("Ingresa tu nombre.");
+            }
+            if (apellidoPaterno === "") {
+                errores.push("Ingresa tu apellido paterno.");
+            }
+            if (apellidoMaterno === "") {
+                errores.push("Ingresa tu apellido materno.");
+            }
 
             // Validar correo
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
@@ -305,8 +317,7 @@ const $form = document.getElementById('registro');
                 return;
             }
 
-            // Obtener nombre a partir del correo
-            let nombre = correo.split("@")[0];
+
 
             let datos = new FormData();
 
@@ -314,6 +325,8 @@ const $form = document.getElementById('registro');
             datos.append("correo", correo);
             datos.append("password", password);
             datos.append("nombre", nombre);
+            datos.append("apellido_paterno", apellidoPaterno);
+            datos.append("apellido_materno", apellidoMaterno);
 
             fetch("../Controlador/ControLogin.php", {
                 method: "POST",
@@ -327,6 +340,7 @@ const $form = document.getElementById('registro');
 
                 if (datos.status) {
                     // Regresar al formulario de inicio de sesión
+
                     inicio.style.display = "block";
                     recuperar.style.display = "none";
                     restablecer.style.display = "none";
@@ -334,6 +348,9 @@ const $form = document.getElementById('registro');
                     crear.style.display = "none";
 
                     // Limpiar campos
+                    document.getElementById("NomU").value = "";
+                    document.getElementById("aPpU").value = "";
+                    document.getElementById("aPmU").value = "";
                     document.getElementById("usuarioCI").value = "";
                     document.getElementById("usuarioaCI").value = "";
                     document.getElementById("contraseñaCI").value = "";
