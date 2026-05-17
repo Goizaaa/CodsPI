@@ -14,7 +14,7 @@ class ControLogin {
         
         if (count($usuarios) > 0) {
             $usuario = $usuarios[0];
-            if ($password == $usuario["password"]) { // Contraseña en texto plano (coincide con tu sistema)
+            if ($password == $usuario["password"]) { 
                 echo json_encode([
                     "status" => true,
                     "mensaje" => "Inicio de sesion correcto",
